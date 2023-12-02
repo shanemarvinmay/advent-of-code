@@ -26,23 +26,30 @@ def read_file(file_path):
         return f.read()
 
 def get_calibration_value(line):
-    calibration_value = 0
-    start, end = 0, len(line) - 1
-
-    while start < len(line):
-        if line[start].isdigit():
-            calibration_value += int(line[start]) * 10
-            break
-        else:
-            start += 1
-    while end > 0:
-        if line[end].isdigit():
-            calibration_value += int(line[end])
-            break
-        else:
-            end -= 1
+    # Why doesn't this work?
+    # calibration_value = 0
+    # start, end = 0, len(line) - 1
+    # while start < len(line):
+    #     if line[start].isdigit():
+    #         calibration_value += int(line[start]) * 10
+    #         break
+    #     else:
+    #         start += 1
+    # while end > 0:
+    #     if line[end].isdigit():
+    #         calibration_value += int(line[end])
+    #         break
+    #     else:
+    #         end -= 1
     
-    return calibration_value
+    # return calibration_value
+    digits = []
+    for i in line:
+        if i.isdigit():
+            digits.append(i)
+    if len(digits):
+        return int(digits[0] + digits[-1])
+    
 
 def trebuchet(input):
     calibration_value = 0
@@ -50,7 +57,6 @@ def trebuchet(input):
     lines = input.split('\n')
 
     for line in lines:
-        # print(line, get_calibration_value(line))
         calibration_value += get_calibration_value(line)
     
     return calibration_value
