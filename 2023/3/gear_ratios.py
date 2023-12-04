@@ -30,35 +30,60 @@ In this schematic, two numbers are not part numbers because they are not adjacen
 Of course, the actual engine schematic is much larger. What is the sum of all of the part numbers in the engine schematic?
 '''
 
-'''scratch
-total = 0
-symbol storage = {line num: set{col num}}
-number storage = {line num: [{num: #, start col :#, end col: #}]}
+def get_symbol_and_number_data(lines):
+    '''get_symbol_and_number_data takes in a list of lines are returns maps of the symbols and numbers.
+    The symbol's output will look like this {line num: set{col num}}
+    The number's output will look like this {line num: [{num: #, start col :#, end col: #}]}'''
+    symbols = dict() # {line num: set{col num}}
+    numbers = dict() # {line num: [{num: #, start col :#, end col: #}]}
 
-lines = file content split \n
+    # Getting symbols and numbers
+    for row in range(len(lines)):
+        line = lines[row]
+        cur_num = []
+        for col in range(len(line)):
+            char = line[col]
+            if char.isdigit():
+                cur_num.append(char)
+            elif len(cur_num):
+                num_str = ''.join(cur_num)
+                cur_num = []
+                if row not in numbers:
+                    numbers[row] = []
+                numbers[row].append({'number': int(num_str), 'start_col': col - len(num_str), 'end_col': col - 1})
+            if char.isdigit() == False and char != '.':
+                if row not in symbols:
+                    symbols[row] = set()
+                symbols[row].add(col)
+    return symbols, numbers
 
-for line num in  range lines length
-    line = lines[line num]
-    cur_num= []
-    for col num in range line length:
-        char = line[col num]
-        if char is digit 
-            cur_num append char
-        elsif cur num not empty
-            num_str = cur num join ''
-            num = int num str
-            cur num = []
-            # check if line num is in number storage
-            num storage [line num] append {num: num, start: col - len(num str), end: col - 1}
-        if char is not digit and char != '.'
-            # check if line num is in symbol storage
-            symbol storage [line num] add col num
 
-for line num in number storage
-    # check horizontal borders for symbols
-    # check diagonal and veritcal borders for symbols
-    # add numbers that touch symbols
-'''
+def get_total_numbers_with_boarding_symbols(symbols, numbers):
+    total = 0
+    for row in numbers:
+        for number_object in numbers[row]:
+            start = number_object['start_col']
+            end = number_object['end_col']
+            # check vertical border
+            if row in symbols:
+                if start - 1 in symbols[row] or end + 1 in symbols[row]:
+                    total += number_object['number']
+                    continue
+            # check diagonal and vertical border below
+            if row + 1 in symbols:
+                for col in symbols[row + 1]:
+                    if start - 1 <= col and col <= end + 1:
+                        total += number_object['number']
+                        continue
+            # check diagonal and vertical border above
+            if row - 1 in symbols:
+                for col in symbols[row - 1]:
+                    if start - 1 <= col and col <= end + 1:
+                        total += number_object['number']
+                        continue
+
+    return total
+
 test_input = '''467..114..
 ...*......
 ..35..633.
@@ -69,33 +94,9 @@ test_input = '''467..114..
 ......755.
 ...$.*....
 .664.598..'''
-symbols = dict() # {line num: set{col num}}
-numbers = dict() # {line num: [{num: #, start col :#, end col: #}]}
-lines = test_input.split('\n')
-
-# Getting symbols and numbers
-for row in range(len(lines)):
-    line = lines[row]
-    cur_num = []
-    for col in range(len(line)):
-        char = line[col]
-        if char.isdigit():
-            cur_num.append(char)
-        elif len(cur_num):
-            num_str = ''.join(cur_num)
-            cur_num = []
-            if row not in numbers:
-                numbers[row] = []
-            numbers[row].append({'number': int(num_str), 'start_col': col - len(num_str), 'end_col': col})
-        if char.isdigit() == False and char != '.':
-            if row not in symbols:
-                symbols[row] = set()
-            symbols[row].add(col)
-
-print('nums')
-for row in numbers:
-    print(row, numbers[row])
-
-print('symbols')
-for row in symbols:
-    print(row, symbols[row])
+if __name__ == '__main__':
+    with open('input_gear_ratio.txt') as f:
+        file_data = f.read()
+    lines = file_data.split('\n')
+    symbols, numbers = get_symbol_and_number_data(lines)                
+    print('Total:', get_total_numbers_with_boarding_symbols(symbols, numbers))
