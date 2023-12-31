@@ -28,10 +28,7 @@ def test_get_possible_moves():
     '|': [1, 3],
     '-': [0, 1]
     }
-    print(test_input)
     for input_char in input_char_for_expected_output:
         row, col = input_char_for_coords[input_char]
         possible_moves = get_possible_moves(row, col, input_char, matrix)
-        if input_char == '|':
-            print(possible_moves)
         assert possible_moves == input_char_for_expected_output[input_char]
